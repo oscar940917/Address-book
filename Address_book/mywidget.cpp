@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QTextStream>
 #include <QMessageBox>
+#include <QFileDialog>  // 這裡加入了 QFileDialog 的頭文件
 
 // 檔案路徑（你可以根據需要修改）
 QString mfilename = "C:\\Users\\user\\Desktop\\EX\\Address-book\\data.csv";
@@ -71,7 +72,17 @@ void Mywidget::on_pushButton_3_clicked()
 {
     QString saveFile = "";
 
-    // 遍歷表格資料，生成 CSV 格式字串
+    // 顯示儲存檔案的對話框
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    "儲存檔案",
+                                                    "C:/",  // 預設路徑
+                                                    "CSV 檔案 (*.csv);;所有檔案 (*.*)");
+
+    if (fileName.isEmpty()) {
+        return;  // 使用者取消選擇
+    }
+
+    // 儲存檔案的邏輯
     for (int i = 0; i < ui->tableWidget->rowCount(); i++) {
         for (int j = 0; j < ui->tableWidget->columnCount(); j++) {
             QTableWidgetItem *item = ui->tableWidget->item(i, j);
@@ -82,24 +93,33 @@ void Mywidget::on_pushButton_3_clicked()
         saveFile += "\n";
     }
 
-    // 寫入 CSV 檔案
-    write(mfilename, saveFile);
-    QMessageBox::information(this, "匯出完成", "資料已匯出至 data.csv");
+    // 將資料寫入選擇的檔案
+    write(fileName, saveFile);
+    QMessageBox::information(this, "匯出完成", "資料已匯出至 " + fileName);
 }
 
 // 匯入資料從 CSV 檔案
 void Mywidget::on_pushButton_6_clicked()
 {
-    QString fileData = readFile(mfilename);
+    // 顯示打開檔案的對話框
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                                    "打開檔案",
+                                                    "C:/",  // 預設路徑
+                                                    "CSV 檔案 (*.csv);;所有檔案 (*.*)");
+
+    if (fileName.isEmpty()) {
+        return;  // 使用者取消選擇
+    }
+
+    // 讀取檔案資料
+    QString fileData = readFile(fileName);
     if (fileData.isEmpty()) {
         QMessageBox::warning(this, "錯誤", "無法讀取檔案");
         return;
     }
 
-    // 清空表格資料
-    ui->tableWidget->setRowCount(0);
+    ui->tableWidget->setRowCount(0);  // 清空表格
 
-    // 解析檔案中的每一行
     QStringList rows = fileData.split("\n");
     for (const QString &row : rows) {
         if (row.trimmed().isEmpty()) continue;
@@ -108,7 +128,6 @@ void Mywidget::on_pushButton_6_clicked()
         int newRow = ui->tableWidget->rowCount();
         ui->tableWidget->insertRow(newRow);
 
-        // 填充表格的每一個儲存格
         for (int j = 0; j < cols.size() && j < 4; j++) {
             ui->tableWidget->setItem(newRow, j, new QTableWidgetItem(cols[j]));
         }
