@@ -7,7 +7,7 @@
 #include <QFileDialog>  // 這裡加入了 QFileDialog 的頭文件
 
 // 檔案路徑（你可以根據需要修改）
-QString mfilename = "C:\\Users\\user\\Desktop\\EX\\Address-book\\data.csv";
+QString mfilename = "C:\\Users\\asus\\OneDrive\\桌面\\QTEX\\txt\\data.csv";
 
 // 寫入檔案
 void write(QString Filename, QString str)
@@ -139,5 +139,6 @@ void Mywidget::on_pushButton_6_clicked()
 // 結束程式
 void Mywidget::on_pushButton_5_clicked()
 {
+
     close();  // 關閉應用程式
 }
